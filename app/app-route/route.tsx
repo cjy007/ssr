@@ -4,6 +4,11 @@ import { useEffect, useState } from 'react';
 
 export const runtime = 'edge'
 
+// export const onRequest: PagesFunction<CloudflareEnv> = async (context) => {
+//   const task = await context.env.MY_KV_NAMESPACE.get("k1");
+//   return new Response(task);
+// };
+
 export async function GET(request: NextRequest) {
   let responseText = '{"aa": "ssssss"}'
 
@@ -14,10 +19,11 @@ export async function GET(request: NextRequest) {
   // )
   //
   // KV Example:
-  // const myKv = getRequestContext().env.MY_KV_NAMESPACE
+  const myKv = getRequestContext().env.MY_KV_NAMESPACE
+  console.log("*** => myKv: ", myKv)
   // await myKv.put('suffix', ' from a KV store!')
-  // const suffix = await myKv.get('suffix')
-  // responseText += suffix
+  const suffix = await myKv.get('k1')
+  responseText += suffix
 
   // const [data, setData] = useState(null);
 
@@ -34,11 +40,12 @@ export async function GET(request: NextRequest) {
   //   }
 
   //   fetchData();
-  // }, []);
+  // }, []);JSON.stringify(myKv)
 
+  
 
   var resp = new Response(responseText)
 
-  resp.headers.set("content-type", "application/json")
+  // resp.headers.set("content-type", "application/json")
   return resp
 }
