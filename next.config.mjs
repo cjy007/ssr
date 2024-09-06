@@ -9,22 +9,6 @@ if (process.env.NODE_ENV === 'development') {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // output: "export", // 打包模式
-  // reactStrictMode: true,
-	// images: {
-  //    unoptimized: true,
-  // },
-	// env: {
-  //   API_PREFIX: process.env.API,
-  // },
-  // async rewrites() {
-  //   return [
-  //     {
-  //       source: "/api/:path*",
-  //       destination: "http://domain:8000/:path*",
-  //     },
-  //   ];
-  // }, // 本地调试时使用
 };
 
 export default nextConfig;
