@@ -9,6 +9,24 @@ if (process.env.NODE_ENV === 'development') {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // basePath: '/next', // url前缀 / => /next/
+  env: {
+    urlBasePath: 'http://localhost:3000',
+  },
+
+  images: {
+    domains: ['dummyjson.com'],
+  },
+
+  // async redirects() {
+  //   return [
+  //     {
+  //       source: '/api',
+  //       destination: 'http://localhost:3000',
+  //       permanent: true,
+  //     },
+  //   ];
+  // },
 };
 
 export default nextConfig;

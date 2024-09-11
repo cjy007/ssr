@@ -10,7 +10,20 @@ export const runtime = 'edge'
 // };
 
 export async function GET(request: NextRequest) {
-  let responseText = '{"aa": "ssssss"}'
+  let responseText = `{
+    "flag": "success",
+    "status": "success",
+    "message": {
+        "error_code": "200",
+        "error_msg": "操作成功",
+        "debug_msg": "",
+        "msg_zh": "操作成功"
+    },
+    "result": {
+        "modelName": "111",
+        "version": "AIFS3.0_V1.0.1_240419.1"
+    }
+}`
 
   // In the edge runtime you can use Bindings that are available in your application
   // (for more details see:
@@ -19,11 +32,11 @@ export async function GET(request: NextRequest) {
   // )
   //
   // KV Example:
-  const myKv = getRequestContext().env.MY_KV_NAMESPACE
-  console.log("*** => myKv: ", myKv)
+  // const myKv = getRequestContext().env.MY_KV_NAMESPACE
+  // console.log("*** => myKv: ", myKv)
   // await myKv.put('suffix', ' from a KV store!')
-  const suffix = await myKv.get('k1')
-  responseText += suffix
+  // const suffix = await myKv.get('k1')
+  // responseText += suffix
 
   // const [data, setData] = useState(null);
 
@@ -46,6 +59,6 @@ export async function GET(request: NextRequest) {
 
   var resp = new Response(responseText)
 
-  // resp.headers.set("content-type", "application/json")
+  resp.headers.set("content-type", "application/json")
   return resp
 }
