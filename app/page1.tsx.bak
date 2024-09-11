@@ -1,4 +1,4 @@
-"use client"
+// "use client"
 import React, { useState, useEffect } from 'react';
 
 // import { useState } from "react"
@@ -48,6 +48,8 @@ interface Hair {
   type: string;
 }
 
+const [data, setData] = useState<Result | null>(null);
+
 export default function Home() {
   try {
     // let ret = await fetch('https://dummyjson.com/users?limit=10', {
@@ -59,8 +61,6 @@ export default function Home() {
     // }).then(resp => resp.json())
     // let posts = await resp.json()
     // console.log("ret => ", ret)
-
-    const [data, setData] = useState<Result | null>(null);
 
     useEffect(() => {
       const fetchData = async () => {
