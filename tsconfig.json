@@ -24,6 +24,6 @@
         "@cloudflare/workers-types/2023-07-01"
     ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "functions/helloword.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "functions/helloword.js", "app/page2.tsx.bak", "app/page1.tsx.bak"],
   "exclude": ["node_modules", "./functions/**/*"]
 }
