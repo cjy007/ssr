@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
 
+export const runtime = 'edge'
+
 export async function GET(request: NextRequest) {
   // 获取查询参数
   const url = new URL(request.url);
