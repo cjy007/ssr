@@ -25,6 +25,8 @@ export async function GET(request: NextRequest) {
     }
 }`
 
+const myMap = new Map();
+
   // In the edge runtime you can use Bindings that are available in your application
   // (for more details see:
   //    - https://developers.cloudflare.com/pages/framework-guides/deploy-a-nextjs-site/#use-bindings-in-your-nextjs-application
@@ -32,10 +34,12 @@ export async function GET(request: NextRequest) {
   // )
   //
   // KV Example:
-  // const myKv = getRequestContext().env.MY_KV_NAMESPACE
-  // console.log("*** => myKv: ", myKv)
-  // await myKv.put('suffix', ' from a KV store!')
-  // const suffix = await myKv.get('k1')
+  const myKv = getRequestContext().env.MY_KV_NAMESPACE
+  console.log("*** => myKv: ", myKv)
+  myMap.set("myKv", JSON.stringify(myKv))
+  await myKv.put('suffix', ' from a KV store!')
+  const suffix = await myKv.get('suffix')
+  myMap.set("myKv", suffix)
   // responseText += suffix
 
   // const [data, setData] = useState(null);
@@ -56,8 +60,9 @@ export async function GET(request: NextRequest) {
   // }, []);JSON.stringify(myKv)
 
   
-
-  var resp = new Response(responseText)
+  const obj = Object.fromEntries(myMap);
+  const jsonString = JSON.stringify(obj);
+  var resp = new Response(jsonString)
 
   resp.headers.set("content-type", "application/json")
   return resp

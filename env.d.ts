@@ -2,5 +2,6 @@
 // by running `wrangler types --env-interface CloudflareEnv env.d.ts`
 
 interface CloudflareEnv {
-	MY_KV_NAMESPACE: KVNamespace;
+	MY_KV_NAMESPACE: MY_KV;
+	MY_DB_NAMESPACE: MY_DB;
 }
