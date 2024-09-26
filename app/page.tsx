@@ -3,14 +3,14 @@ import React, { useState, useEffect } from 'react';
 
 function Page() {
   const [inputValue, setInputValue] = useState(''); // 初始化状态
-  const handleChange = (event) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value); // 更新状态为输入值
   };
 
 
   const [data, setData] = useState("等待查询");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<Error | null>(null);
 
 
   const search = async () => {
@@ -30,8 +30,11 @@ function Page() {
       const result = await response.json();
       setData(JSON.stringify(result));
     } catch (err) {
-      setError(err.message);
-      console.log(err)
+      if (err instanceof Error) {
+        setError(err);
+      } else {
+        console.log(err)
+      }
     } finally {
       setLoading(false);
     }
