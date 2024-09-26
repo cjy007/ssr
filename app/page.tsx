@@ -31,6 +31,7 @@ function Page() {
       setData(JSON.stringify(result));
     } catch (err) {
       setError(err.message);
+      console.log(err)
     } finally {
       setLoading(false);
     }

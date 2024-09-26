@@ -23,7 +23,6 @@ function Page() {
                 type="email"
                 className="w-full rounded-md border border-solid border-gray-300 px-3 py-[10px] text-sm text-black placeholder:text-black"
                 placeholder="url"
-                required=""
               />
               <input
                 type="submit"
