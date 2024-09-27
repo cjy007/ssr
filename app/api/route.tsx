@@ -34,7 +34,7 @@ const myMap = new Map();
   // )
   //
   // KV Example:
-  const myKv = getRequestContext().env.MY_KV_NAMESPACE
+  const myKv = getRequestContext().env.MY_KV1
   console.log("*** => myKv: ", myKv)
   myMap.set("myKv", JSON.stringify(myKv))
   await myKv.put('suffix', ' from a KV store!')
