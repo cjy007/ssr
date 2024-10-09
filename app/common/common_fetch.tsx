@@ -1,9 +1,10 @@
 
 const globalFetch = (
     input: RequestInfo,
-    init?: RequestInit<RequestInitCfProperties>): Promise<Response> => {
+    init?: RequestInit<RequestInitCfProperties>): Promise<Response | null> => {
 
-    return fetch(input, init);
+    let resp: Promise<Response> = fetch(input, init);
+    return resp;
 }
 
 export { globalFetch };

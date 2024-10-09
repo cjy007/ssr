@@ -25,6 +25,6 @@
     ],
     "baseUrl": "app"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "functions/helloword.js", "app/page2.tsx.bak", "app/page1.tsx.bak", "app/page3.tsx.bak"],
-  "exclude": ["node_modules", "./functions/**/*"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

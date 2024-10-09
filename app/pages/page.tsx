@@ -1,7 +1,6 @@
-// "use client"
+"use client"
 import React, { useState, useEffect } from 'react';
 
-// import { useState } from "react"
 import Image from "next/image";
 
 
@@ -48,9 +47,9 @@ interface Hair {
   type: string;
 }
 
-const [data, setData] = useState<Result | null>(null);
 
 export default function Home() {
+  const [data, setData] = useState<Result | undefined>(undefined);
   try {
     // let ret = await fetch('https://dummyjson.com/users?limit=10', {
     //   method: 'GET',
@@ -64,7 +63,7 @@ export default function Home() {
 
     useEffect(() => {
       const fetchData = async () => {
-        const response = await fetch('https://dummyjson.com/users?limit=2');
+        const response = await fetch('https://dummyjson.com/users?limit=20');
         const result: Result = await response.json();
         console.log(result)
         setData(result);
@@ -73,15 +72,15 @@ export default function Home() {
       fetchData();
     }, []);
 
-    console.log(data)
-
-    if (!data) throw "无数据"
+    // if (!data) {
+    //   return <div>数据加载中</div>;
+    // }
 
     return <main className="flex min-h-screen flex-col items-center justify-between p-24">
         <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
           <ul>
             {data?.users.map((user) => (
-              <li key={user.id}>{user.username}:
+              <li key={user.id}>{JSON.stringify(user)}:
                 <Image
                   src={user.image}
                   alt="Picture of the author"

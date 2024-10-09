@@ -1,30 +1,30 @@
 import { NextRequest } from "next/server";
-import { globalFetch } from "common/common_fetch.tsx"
+// import { globalFetch } from "common/common_fetch.tsx"
 
 export const runtime = 'edge'
 
-export async function GET(request: NextRequest) {
-  // // 获取查询参数
-  // const url = new URL(request.url);
-  // const queryParams = url.searchParams;
-  // url.toJSON()
-  // console.log(queryParams)
-  try {
-    const response = await globalFetch('https://dummyjson.com/users?limit=10')
-    .then((resp) => {
-      return resp.json();
-    });
-    const data = "{'a':1}"// await response.json();
+// export async function GET(request: NextRequest) {
+//   // // 获取查询参数
+//   // const url = new URL(request.url);
+//   // const queryParams = url.searchParams;
+//   // url.toJSON()
+//   // console.log(queryParams)
+//   try {
+//     const response = await fetch('https://dummyjson.com/users?limit=10');
+//     if (!response.ok) {
+//       throw new Error('网络响应不正常');
+//     }
+//     const data = await response.json();
 
-    var resp = new Response(JSON.stringify(response))
-    resp.headers.set("content-type", "application/json")
-    return resp;
-  } catch (error) {
-    console.error('Fetch error:', error.message);
-    // 可以根据需要进一步处理错误
-    return null;
-  }
-};
+//     var resp = new Response(JSON.stringify(data))
+//     resp.headers.set("content-type", "application/json")
+//     return resp;
+//   } catch (error) {
+//     console.error('Fetch error:', error.message);
+//     // 可以根据需要进一步处理错误
+//     return null;
+//   }
+// };
 
 export async function POST(request: NextRequest) {
   // 解析请求体

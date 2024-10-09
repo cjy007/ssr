@@ -2,7 +2,6 @@
 
 
 function Page() {
-  console.log("aaaaa");
 
   const search = () => {
     console.log("search")
