@@ -1,10 +1,12 @@
 {
     "version": 1,
-    "description": "routes",
     "include": [
-        "/*"
+        "/_worker.js/__next-on-pages-dist__/functions/api/d1*",
+        "/_worker.js/__next-on-pages-dist__/functions/api/kv*"
     ],
     "exclude": [
-        "/_next/static/*"
+        "/_next/static/*",
+        "/favicon.ico",
+        "/*.svg"
     ]
 }
