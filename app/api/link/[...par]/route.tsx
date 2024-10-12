@@ -21,8 +21,15 @@ export async function GET(request: NextRequest, params: string) {
 
   console.log("params:",params)
 
-  var resp = new Response(responseText)
 
-  resp.headers.set("content-type", "application/json")
-  return resp
+  const res = await fetch("https://dummyjson.com/users?limit=10");
+  const data = await res.json();
+ 
+  return Response.json({ data });
+
+
+  // var resp = new Response(responseText)
+
+  // resp.headers.set("content-type", "application/json")
+  // return resp
 }

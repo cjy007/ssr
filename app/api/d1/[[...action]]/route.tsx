@@ -6,10 +6,19 @@ export const runtime = 'edge'
 
 
 
+/*
+JavaScript	|  D1
+--------------------
+null        |  NULL
+Number      |  REAL
+Number      |  INTEGER
+String      |  TEXT
+Boolean     |  INTEGER
+ArrayBuffer |  BLOB
+*/
 
 
-
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest, action?: string[]) {
   const myMap = new Map();
 
   const { results } = await getRequestContext().env.MY_DB1.prepare(
@@ -27,7 +36,7 @@ export async function GET(request: NextRequest) {
   return resp
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest, action?: string[]) {
   const body = await request.json();
   console.log("body--------", body)
 
