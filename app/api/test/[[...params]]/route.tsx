@@ -13,16 +13,43 @@ export async function GET(request: NextRequest, dynamicSegment?: string[]) {
   // 获取请求的 URL
   const { searchParams } = new URL(request.url);
   // 获取所有的查询参数
-  const params = Object.fromEntries(searchParams.entries());
+  let params = Object.fromEntries(searchParams.entries());
+
+  const md5Vals = searchParams.getAll('md5'); // 获取所有相同名称的参数
 
   const db: D1Database = getRequestContext().env.MY_DB1;
 
-  const qSql = `SELECT * FROM \`t_entity_ray_point\` WHERE delete_status=0 `;
-  const { results } = await db.prepare(qSql)
-    .run();
+  let qSql = `SELECT * FROM \`t_entity_ray_point\` WHERE delete_status=0 `;
 
-  console.log(params)
-  return NextResponse.json({ params, results }, { status: 200 });
+  let arr: any = []
+
+  if (md5Vals.length > 0) {
+    qSql = `${qSql} and md5 in (${md5Vals.map(o => '?').join(",")})`
+    arr = [
+      ...arr,
+      ...md5Vals
+    ]
+  }
+
+  const status = params.status
+  if (status) {
+    qSql = `${qSql} and status= ?`
+    arr = [
+      ...arr,
+      Number(status)
+    ]
+  }
+
+  console.log("qSql", qSql)
+  console.log("arr", arr)
+
+  let stmt :D1PreparedStatement = db.prepare(qSql)
+  if (arr.length > 0) {
+    stmt = stmt.bind(...arr)
+  }
+  const { results } = await stmt.run();
+
+  return NextResponse.json({ params, md5Vals, results }, { status: 200 });
 }
 
 interface Param {
@@ -142,8 +169,12 @@ export async function POST(request: NextRequest, params?: string[]) {
 }
 
 export async function DELETE(request: NextRequest, par?: string[]) {
-  const params = await request.json()
-  return NextResponse.json(params, { status: 200 });
+  const body = await request.json()
+
+  // const db: D1Database = getRequestContext().env.MY_DB1;
+
+  // const delRet = await db.exec('delete from `t_entity_ray_point`')
+  return NextResponse.json(body, { status: 200 });
 }
 
 function formatDate(date: Date): string {
