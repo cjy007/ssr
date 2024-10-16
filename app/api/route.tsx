@@ -15,6 +15,7 @@ export async function PATCH(request: Request) {}
 export async function OPTIONS(request: Request) {}
 */
 
+import Resp from '@/common/resp'
 import type { NextRequest } from 'next/server'
 
 export const runtime = 'edge'
@@ -35,8 +36,8 @@ export async function GET(request: NextRequest) {
     }
   }`
 
-  var resp = new Response(responseText)
+  // var resp = new Response(responseText)
 
-  resp.headers.set("content-type", "application/json")
-  return resp
+  // resp.headers.set("content-type", "application/json")
+  return Resp.success(responseText)
 }

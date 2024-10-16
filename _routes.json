@@ -1,8 +1,7 @@
 {
     "version": 1,
     "include": [
-        "/_worker.js/__next-on-pages-dist__/functions/api/d1*",
-        "/_worker.js/__next-on-pages-dist__/functions/api/kv*"
+        "/api/*"
     ],
     "exclude": [
         "/_next/static/*",
