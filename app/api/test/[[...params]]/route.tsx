@@ -4,6 +4,8 @@ import EntityRayPoint from "@/common/entity/EntityRayPoint";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import Resp from "@/common/resp";
 import PointType from "@/common/enum/PointType";
+import Log from "@/common/Logger";
+import Logger from "@/common/Logger";
 
 export const runtime = 'edge'
 
@@ -12,6 +14,8 @@ interface Query {
 }
 
 export async function GET(request: NextRequest, dynamicSegment?: string[]) {
+  Logger.info("获取所有相同名称的参数")
+
   // 获取请求的 URL
   const { searchParams } = new URL(request.url);
   // 获取所有的查询参数
@@ -42,8 +46,7 @@ export async function GET(request: NextRequest, dynamicSegment?: string[]) {
     ]
   }
 
-  console.log("qSql", qSql)
-  console.log("arr", arr)
+  Logger.info("qSql", qSql)
 
   let stmt :D1PreparedStatement = db.prepare(qSql)
   if (arr.length > 0) {
@@ -83,8 +86,8 @@ export async function POST(request: NextRequest, dynamicSegment?: string[]) {
 
     const entityRayPoint = new EntityRayPoint();
     // entityRayPoint.create_time = formatDate(new Date())
-    entityRayPoint.point_type = splitArr[0]
-    entityRayPoint.point_content = v
+    entityRayPoint.point_type = splitArr[0];
+    entityRayPoint.point_content = v;
 
     fillPointInfo(entityRayPoint, splitArr[1])
 
@@ -114,6 +117,10 @@ export async function POST(request: NextRequest, dynamicSegment?: string[]) {
 
   entityRayPoints = entityRayPoints.filter(e => !existsMd5List.includes(e.md5));
 
+  if (entityRayPoints.length == 0) {
+    return Resp.fail("没有未存储的节点信息");
+  }
+
   console.log("未存储的point数量:", entityRayPoints.length)
 
   const insertSql = `insert into t_entity_ray_point (
@@ -127,30 +134,48 @@ export async function POST(request: NextRequest, dynamicSegment?: string[]) {
     \`source_from\`
     ) values (?,?,?,?,?,?,?,?,?)`;
 
-  const stmt = db.prepare(insertSql)
+  const stmt = db.prepare(insertSql);
 
-  const list: D1PreparedStatement[] = entityRayPoints.map(e => {
+  const stmtList: D1PreparedStatement[] = entityRayPoints.map(e => {
     const md5Val = e.md5
     if (md5Val != undefined && existsMd5List.includes(md5Val)) {
       return undefined
     }
-    return stmt.bind(
-      1, 1, JSON.stringify(e.remark),
-      // e.md5, e.md5_sub, e.encryption_type, e.point_type, e.context, e.point_contect, e.source_from
+    const arr = [
+      1, 1,
+      e.remark !== undefined && e.remark !== null ? JSON.stringify(e.remark) : null,
       md5Val,
       e.encryption_type !== undefined ? e.encryption_type : null,
       e.point_type !== undefined ? e.point_type : null,
       e.describe !== undefined ? e.describe : null,
       e.point_content !== undefined ? e.point_content : null,
       e.source_from !== undefined ? e.source_from : null
-    )
-  }).filter(e => e !== undefined)
+    ];
+    return stmt.bind(...arr)
+  }).filter(e => e !== undefined);
 
-  if (list.length == 0) {
-    return Resp.fail("没有未存储的节点信息");
-  }
+  /**
+   * [
+        {
+          "success": true,
+          "meta": {
+            "served_by": "miniflare.db",
+            "duration": 0,
+            "changes": 1,
+            "last_row_id": 24,
+            "changed_db": true,
+            "size_after": 24576,
+            "rows_read": 2,
+            "rows_written": 3
+          },
+          "results": []
+        },
+        ...
+      ]
+   */
+  const rows = await db.batch(stmtList);
 
-  const rows = await db.batch(list)
+  console.log("数据插入结果", rows)
 
   return Resp.success(rows);
 }
@@ -205,11 +230,15 @@ function fillPointInfo(entityRayPoint: EntityRayPoint, content: string) {
       case PointType.SHADOWSOCKS :
         fillShadowsocks(entityRayPoint, content)
         break;
+      case PointType.TROJAN :
+        fillTrojan(entityRayPoint, content)
+        break;
       default:
+        fillDefault(entityRayPoint, content);
         break;
     }
   }catch (error) {
-    console.error('填充节点信息时出错:', error);
+    Logger.error('填充节点信息时出错:', error);
     entityRayPoint.remark = '填充节点信息时出错, err=' + error
   }
 }
@@ -275,7 +304,7 @@ function fillVless(entityRayPoint: EntityRayPoint, content: string) {
   const idx2 = content.indexOf("?")
   const idx3 = content.indexOf("#")
 
-  const sub1 = content.slice(0, idx1); // 17714732-15b6-5b7a-9703-8c874ef8bef4
+  // const sub1 = content.slice(0, idx1); // id 17714732-15b6-5b7a-9703-8c874ef8bef4
   const sub2 = content.slice(idx1 + 1, idx2); // 185.174.138.194:80
   // const sub3 = content.slice(idx2 + 1, idx3); // security=none&type=ws&sni=55965.olielielie.store.&path=/vless&encryption=none&headerType=none
   const sub4 = content.slice(idx3 + 1); // 🇷🇺_定制专线：@Alin006Bot
@@ -339,5 +368,54 @@ function fillShadowsocks(entityRayPoint: EntityRayPoint, content: string) {
   entityRayPoint.md5 = CryptoJS.MD5(JSON.stringify(md5Key)).toString()
   entityRayPoint.describe = decodeURIComponent(sub3);
   entityRayPoint.remark = JSON.stringify({"header": decode, "addr": sub2, "desc": sub3});
+}
+
+/**
+ * 64f33df2-4f9d-4cf3-bb69-b82b08cf149a@ent1.imyourdaddy.top:20985?allowInsecure=1&peer=sale.alibaba.com&sni=sale.alibaba.com#俄罗斯01-0.01×-油管无广告
+ * 
+ * @param entityRayPoint 填充Trojan信息
+ * @param content 
+ */
+function fillTrojan(entityRayPoint: EntityRayPoint, content: string) {
+  const idx1 = content.indexOf("@")
+  const idx2 = content.indexOf("?")
+  const idx3 = content.indexOf("#")
+
+  const sub1 = content.slice(0, idx1); // 密码 64f33df2-4f9d-4cf3-bb69-b82b08cf149a
+  const sub2 = content.slice(idx1 + 1, idx2); // 地址:端口 ent1.imyourdaddy.top:20985
+  const sub4 = content.slice(idx3 + 1); // 俄罗斯01-0.01×-油管无广告
+
+  const url = "http://" + content.slice(idx1 + 1, idx3)
+  
+  // 获取请求的 URL
+  const { searchParams } = new URL(url);
+  /**
+   * 获取所有的查询参数
+   * params {
+      allowInsecure: '1',
+      peer: 'sale.alibaba.com',
+      sni: 'sale.alibaba.com'
+    }
+   */
+  let params = Object.fromEntries(searchParams.entries());
+
+  const md5Key = [
+    sub1,
+    sub2
+  ];
+
+  entityRayPoint.md5 = CryptoJS.MD5(JSON.stringify(md5Key)).toString()
+  entityRayPoint.describe = decodeURIComponent(sub4);
+  entityRayPoint.remark = JSON.stringify(params);
+}
+
+/**
+ * 无法解析的类型
+ * @param entityRayPoint 填充信息
+ * @param content 
+ */
+function fillDefault(entityRayPoint: EntityRayPoint, content: string) {
+  entityRayPoint.md5 = CryptoJS.MD5(content).toString()
+  entityRayPoint.describe = "无法解析的类型(" + entityRayPoint.md5 + ")"
 }
 

@@ -7,6 +7,7 @@ enum Code {
 }
 
 export default class Resp {
+  
   static success(data?: any): NextResponse {
     return NextResponse.json({
       code: Code.SUCCESS,
@@ -16,10 +17,10 @@ export default class Resp {
     // return new Result(200, "success", data);
   }
 
-  static fail(data?: any): NextResponse {
+  static fail(message?: string, data?: any): NextResponse {
     return NextResponse.json({
       code: Code.FAIL,
-      message: "failed",
+      message: message == undefined || message == null ? "failed" : message,
       data: data
     })
     // return new Result(code, message, null);
