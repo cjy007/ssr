@@ -22,7 +22,7 @@ function Page() {
     setLoading(true);
     setError(null); // 重置错误状态
     try {
-      const response = await fetch('https://d1-worker-test.changjy0213.workers.dev/');
+      const response = await fetch('/api/search?url='+inputValue);
       console.log(response)
       if (!response.ok) {
         throw new Error('网络响应不正常');
